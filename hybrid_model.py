@@ -57,3 +57,42 @@ frauds = sc.inverse_transform(frauds)
 # Combine the two models, take input from results of SOMs
 # Ranking of predicted probablity of each customers cheated
 
+# Creating the matrix of features
+customers = dataset.iloc[:, 1:].values
+
+# Creating the dependent variable (690 elements, 0 and customer ID in fraud)
+is_fraud = np.zeros(len(dataset))
+for i in range(len(dataset)):
+    if dataset.iloc(i, 0) in frauds:
+        is_fraud[i] = 1
+        
+# Feature Scaling
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+customers = sc.fit_transform(customers)
+
+# Part 2 - Now let's make the ANN!
+
+# Importing the Keras libraries and packages
+from keras.models import Sequential
+from keras.layers import Dense
+
+# Initialising the ANN
+classifier = Sequential()
+
+# Adding the input layer and the first hidden layer
+classifier.add(Dense(units = 2, kernel_initializer = 'uniform', activation = 'relu', input_dim = 15))
+
+# Adding the output layer
+classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
+
+# Compiling the ANN
+classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+
+# Fitting the ANN to the Training set
+classifier.fit(customers, is_fraud, batch_size = 1, epochs = 2)
+
+# Part 3 - Making predictions and evaluating the model
+
+# Predicting the Test set results
+y_pred = classifier.predict(X_test)
