@@ -43,6 +43,8 @@ show()
 # Finding the frauds
 mappings = som.win_map(X)
 frauds = np.concatenate((mappings[(3,8)], mappings[(5,7)]), axis = 0)
+frauds = np.concatenate((mappings[(3,3)], mappings[(8,4)]), axis = 0)
+
 frauds = sc.inverse_transform(frauds)
 
 # Part 2 - Going from Unsupervised to Supervised Deep Learning
@@ -94,5 +96,8 @@ classifier.fit(customers, is_fraud, batch_size = 1, epochs = 2)
 
 # Part 3 - Making predictions and evaluating the model
 
-# Predicting the Test set results
-y_pred = classifier.predict(X_test)
+# Predicting the probabilities of frauds
+y_pred = classifier.predict(customers)
+y_pred = np.concatenate((dataset.iloc[:, 0:1].values, y_pred), axis = 1)
+y_pred = y_pred[y_pred[:, 1].argsort()]
+
